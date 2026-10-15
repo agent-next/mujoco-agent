@@ -102,8 +102,8 @@ Welcome to the MuJoCo MCP documentation. This index provides a comprehensive ove
 #### Basic Setup
 ```bash
 # Clone repository
-git clone https://github.com/robotlearning123/mujoco-mcp.git
-cd mujoco-mcp
+git clone https://github.com/agent-next/mujoco-agent.git
+cd mujoco-agent
 
 # Install in development mode
 pip install -e .
@@ -243,7 +243,7 @@ coordinator.start_coordination()
 - [dm_control](https://github.com/google-deepmind/dm_control) - DeepMind control suite
 
 ### Community
-- Report issues: [GitHub Issues](https://github.com/robotlearning123/mujoco-mcp/issues)
+- Report issues: [GitHub Issues](https://github.com/agent-next/mujoco-agent/issues)
 - Discussions: Use GitHub Discussions for questions
 - Contributing: See [CONTRIBUTING.md](CONTRIBUTING.md)
 
