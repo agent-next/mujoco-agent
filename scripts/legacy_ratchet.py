@@ -27,8 +27,10 @@ def run_file(path: Path, xml_path: Path) -> dict:
          f"--junitxml={xml_path}", str(path)],
         cwd=ROOT, env=env, capture_output=True, text=True, timeout=600,
     )
-    if not xml_path.exists():
-        return {"passed": 0, "failed": 0, "errors": 1, "rc": proc.returncode}
+    # 0-2 are test outcomes (2 = collection errors, still reported in XML);
+    # a signal, internal error or missing XML means the file never reported.
+    if proc.returncode not in (0, 1, 2, 5) or not xml_path.exists():
+        return {"passed": 0, "failed": 0, "errors": 0, "rc": proc.returncode, "crashed": True}
     suite = ET.parse(xml_path).getroot()
     suite = suite if suite.tag == "testsuite" else suite.find("testsuite")
     tests, fail, err, skip = (int(suite.get(k, 0)) for k in ("tests", "failures", "errors", "skipped"))
@@ -38,13 +40,19 @@ def run_file(path: Path, xml_path: Path) -> dict:
 def main() -> int:
     files = sorted((ROOT / "tests").rglob("test_*.py"))
     totals = {"passed": 0, "failed": 0, "errors": 0}
+    crashed = []
     with tempfile.TemporaryDirectory() as tmp:
         for i, path in enumerate(files):
             res = run_file(path, Path(tmp) / f"{i}.xml")
             for k in totals:
                 totals[k] += res[k]
+            if res.get("crashed"):
+                crashed.append(f"{path.relative_to(ROOT)} (rc={res['rc']})")
             print(f"{path.relative_to(ROOT)}: {res}")
     print(f"legacy totals: {totals}")
+    if crashed:
+        print("LEGACY RATCHET FAILED: test files crashed without reporting: " + ", ".join(crashed))
+        return 1
     if "--update" in sys.argv:
         BASELINE.write_text(json.dumps(totals, indent=2) + "\n")
         print(f"baseline written: {BASELINE.relative_to(ROOT)}")
