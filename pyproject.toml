@@ -91,10 +91,10 @@ mujoco-mcp = "mujoco_mcp.__main__:main"
 mujoco-mcp-viewer = "mujoco_mcp.viewer_server:main"
 
 [project.urls]
-"Homepage" = "https://github.com/robotlearning123/mujoco-mcp"
+"Homepage" = "https://github.com/agent-next/mujoco-agent"
 "Documentation" = "https://mujoco-mcp.readthedocs.io"
-"Bug Tracker" = "https://github.com/robotlearning123/mujoco-mcp/issues"
-"Source" = "https://github.com/robotlearning123/mujoco-mcp"
+"Bug Tracker" = "https://github.com/agent-next/mujoco-agent/issues"
+"Source" = "https://github.com/agent-next/mujoco-agent"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
