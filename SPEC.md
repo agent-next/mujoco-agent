@@ -89,8 +89,14 @@ Every recipe is executed by a fleet worker through the outsider path only
    locomotion with a bundled policy, L4 Blender scene + multiple robots, L5 new
    skill training); record success, turns, wall time and human interventions.
    Run once on the current image as the baseline, then after each wave.
+   A run succeeds when the recipe's judge passes on the produced artifact
+   with zero human interventions. v0 targets per account, 5 runs per level:
+   L1 and L2 5/5, L3 >= 4/5, L4 >= 3/5, L5 reported only. The baseline run
+   has no target; it sets the number each wave must beat.
 2. Every shipped video passes the sandbox `video_gate.py` motion gate and a
-   cross-model frame review.
+   cross-model frame review: a reviewer of a different model family opens at
+   least three frames spread over the clip and confirms each visibly shows
+   the claimed behavior; one "does not show" fails the video.
 3. `.claude/verify.sh` green; new core coverage >= 90%.
 
 ## Legacy suite

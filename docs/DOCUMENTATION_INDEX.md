@@ -103,7 +103,7 @@ Welcome to the MuJoCo MCP documentation. This index provides a comprehensive ove
 ```bash
 # Clone repository
 git clone https://github.com/agent-next/mujoco-agent.git
-cd mujoco-mcp
+cd mujoco-agent
 
 # Install in development mode
 pip install -e .
