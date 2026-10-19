@@ -260,8 +260,8 @@ class VerifyHandoffTests(unittest.TestCase):
 
     def run_verify(self, **env):
         proc = subprocess.run(["bash", str(VERIFY)], capture_output=True, text=True,
-                              env={**os.environ, "PYTHON": self.stub,
-                                   "STUB_LOG": str(self.log), **env}, timeout=300)
+                              env={**{k: v for k, v in os.environ.items() if k != "TESTS"},  # CI sets TESTS
+                                   "PYTHON": self.stub, "STUB_LOG": str(self.log), **env}, timeout=300)
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
         calls = [line.split("\0") for line in self.log.read_text().splitlines()]
         ratchet_calls = [args for args in calls
