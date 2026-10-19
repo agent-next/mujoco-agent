@@ -6,7 +6,8 @@ are summed from JUnit XML, and the gate fails if passes drop or
 failures/errors grow versus tests/LEGACY_BASELINE.json. With file arguments
 (the `TESTS` selection from scripts/ci/affected.py, or `ALL` for everything),
 only those files run and each is gated against its own floor in
-tests/LEGACY_BASELINE_FILES.json (a file without an entry must be green).
+tests/LEGACY_BASELINE_FILES.json (a file with no entry there has no floor to
+hold it up, so any result but "nothing ran" fails).
 `--update` runs everything and rewrites both baselines; only lower them
 when tests are fixed or a legacy module is removed on purpose.
 """
@@ -69,9 +70,13 @@ def check_aggregate(totals, base):
 
 def check_per_file(results, floors):
     regressions = []
+    zero = {"passed": 0, "failed": 0, "errors": 0}
     for path in sorted(results):
         rel = str(path.relative_to(ROOT))
-        res, floor = results[path], floors.get(rel, {"passed": 0, "failed": 0, "errors": 0})
+        res, floor = results[path], floors.get(rel, zero)
+        if floor == zero and res != zero:
+            regressions.append(f"{rel}: no measured baseline; result {res}")
+            continue
         for k in ("passed", "failed", "errors"):
             if k == "passed" and res[k] < floor[k]:
                 regressions.append(f"{rel}: passed {res[k]} < baseline {floor[k]}")
@@ -80,13 +85,25 @@ def check_per_file(results, floors):
     return regressions
 
 
-def main() -> int:
-    flags = [a for a in sys.argv[1:] if a.startswith("--")]
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    update = "--update" in flags
+def parse_args(argv):
+    """Return (update, jobs, files); `--jobs` must carry its value."""
+    update = False
     jobs = int(os.environ.get("TEST_JOBS", "0")) or min(8, 2 * (os.cpu_count() or 1))
-    if "--jobs" in flags:
-        jobs = int(flags[flags.index("--jobs") + 1])
+    args = []
+    rest = list(argv)
+    while rest:
+        arg = rest.pop(0)
+        if arg == "--update":
+            update = True
+        elif arg == "--jobs":
+            jobs = int(rest.pop(0))  # raises cleanly if the value is missing
+        else:
+            args.append(arg)
+    return update, jobs, args
+
+
+def main() -> int:
+    update, jobs, args = parse_args(sys.argv[1:])
     if update:
         args = []  # a baseline rewrite must measure the whole suite
     if not args or args == ["ALL"]:

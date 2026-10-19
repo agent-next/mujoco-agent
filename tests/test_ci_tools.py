@@ -1,5 +1,6 @@
 """Hermetic tests for scripts/ci: each case builds a throwaway git repo."""
 
+import importlib
 import json
 import os
 import subprocess
@@ -262,6 +263,70 @@ class AffectedTests(unittest.TestCase):
         r = self.change("orphan.cfg")
         self.assertEqual(r["mode"], "all")
         self.assertIn("no test reaches", r["reason"])
+
+
+class LegacyRatchetTests(unittest.TestCase):
+    """Tests for scripts/legacy_ratchet.py argument handling and subset gating."""
+
+    @staticmethod
+    def ratchet():
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+        try:
+            return importlib.import_module("legacy_ratchet")
+        finally:
+            sys.path.pop(0)
+
+    def run_ratchet(self, *argv):
+        return subprocess.run(
+            [sys.executable, str(Path(__file__).resolve().parents[1]
+                                 / "scripts" / "legacy_ratchet.py"), *argv],
+            capture_output=True, text=True, cwd=Path(__file__).resolve().parents[1])
+
+    def test_jobs_takes_its_value(self):
+        # --jobs and its value must parse together; previously the value was
+        # filtered out of `flags` and indexed as though it were still there.
+        out = self.run_ratchet("--jobs", "2", "tests/does_not_exist.py")
+        self.assertNotIn("IndexError", out.stderr, out.stderr)
+        self.assertIn("no such test files", out.stdout, out.stderr)
+        self.assertEqual(out.returncode, 1)
+
+    def test_jobs_value_reaches_the_pool(self):
+        update, jobs, files = self.ratchet().parse_args(["--jobs", "2", "ALL"])
+        self.assertEqual((update, jobs, files), (False, 2, ["ALL"]))
+        update, jobs, files = self.ratchet().parse_args(["--update"])
+        self.assertEqual((update, files), (True, []))
+        self.assertGreaterEqual(jobs, 1)
+
+    def test_subset_without_a_baseline_cannot_pass(self):
+        # A selected file with no per-file baseline entry must not be gated
+        # against an implicit zero floor: previously any result — green or
+        # red — slipped through the zero fallback.
+        ratchet = self.ratchet()
+        path = ratchet.ROOT / "tests" / "test_unmeasured.py"
+        res = {path: {"passed": 5, "failed": 0, "errors": 0}}
+        self.assertEqual(ratchet.check_per_file(res, {}),
+                         ["tests/test_unmeasured.py: no measured baseline; result "
+                          "{'passed': 5, 'failed': 0, 'errors': 0}"])
+        red = {path: {"passed": 0, "failed": 3, "errors": 0}}
+        self.assertEqual(ratchet.check_per_file(red, {}),
+                         ["tests/test_unmeasured.py: no measured baseline; result "
+                          "{'passed': 0, 'failed': 3, 'errors': 0}"])
+        # a genuinely empty file with no entry stays passable
+        empty = {path: {"passed": 0, "failed": 0, "errors": 0}}
+        self.assertEqual(ratchet.check_per_file(empty, {}), [])
+
+    def test_subset_against_a_measured_floor(self):
+        ratchet = self.ratchet()
+        path = ratchet.ROOT / "tests" / "test_x.py"
+        floors = {"tests/test_x.py": {"passed": 3, "failed": 0, "errors": 0}}
+        worse = {path: {"passed": 2, "failed": 0, "errors": 0}}
+        self.assertEqual(ratchet.check_per_file(worse, floors),
+                         ["tests/test_x.py: passed 2 < baseline 3"])
+        flaky = {path: {"passed": 3, "failed": 1, "errors": 0}}
+        self.assertEqual(ratchet.check_per_file(flaky, floors),
+                         ["tests/test_x.py: failed 1 > baseline 0"])
+        same = {path: {"passed": 3, "failed": 0, "errors": 0}}
+        self.assertEqual(ratchet.check_per_file(same, floors), [])
 
 
 class RecallProbeTests(unittest.TestCase):
