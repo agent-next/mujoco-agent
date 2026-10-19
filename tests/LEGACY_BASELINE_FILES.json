@@ -1,0 +1,147 @@
+{
+  "tests/integration/test_advanced_features.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/integration/test_basic_scenes.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/integration/test_debug.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/integration/test_end_to_end_workflows.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/integration/test_headless_server.py": {
+    "errors": 0,
+    "failed": 1,
+    "passed": 0
+  },
+  "tests/integration/test_menagerie_models.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/integration/test_motion_control.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 4
+  },
+  "tests/mcp/test_mcp_compliance.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 4
+  },
+  "tests/mcp/test_mcp_compliance_fixes.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/mcp/test_mcp_menagerie_final.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 1
+  },
+  "tests/mcp/test_mcp_menagerie_integration.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/performance/test_performance_benchmark.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/rl/test_rl_advanced.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/rl/test_rl_functionality.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/rl/test_rl_integration.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/rl/test_rl_simple.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 2
+  },
+  "tests/test_ci_tools.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 69
+  },
+  "tests/test_v0_8_basic.py": {
+    "errors": 0,
+    "failed": 3,
+    "passed": 1
+  },
+  "tests/unit/test_advanced_controllers.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/unit/test_coordinated_task_validation.py": {
+    "errors": 0,
+    "failed": 14,
+    "passed": 0
+  },
+  "tests/unit/test_menagerie_loader.py": {
+    "errors": 0,
+    "failed": 3,
+    "passed": 28
+  },
+  "tests/unit/test_multi_robot_coordinator.py": {
+    "errors": 0,
+    "failed": 25,
+    "passed": 14
+  },
+  "tests/unit/test_property_based_controllers.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/unit/test_property_based_sensors.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/unit/test_rl_config_validation.py": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 15
+  },
+  "tests/unit/test_robot_controller.py": {
+    "errors": 0,
+    "failed": 6,
+    "passed": 33
+  },
+  "tests/unit/test_sensor_feedback.py": {
+    "errors": 1,
+    "failed": 0,
+    "passed": 0
+  },
+  "tests/unit/test_simulation.py": {
+    "errors": 0,
+    "failed": 2,
+    "passed": 53
+  },
+  "tests/unit/test_viewer_client_errors.py": {
+    "errors": 0,
+    "failed": 13,
+    "passed": 0
+  }
+}
