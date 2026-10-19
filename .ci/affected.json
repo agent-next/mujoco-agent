@@ -1,0 +1,29 @@
+{
+  "full": [
+    ".github/**",
+    "Makefile",
+    "*.mk",
+    "pyproject.toml",
+    "setup.py",
+    "setup.cfg",
+    "requirements*.txt",
+    "uv.lock",
+    "poetry.lock",
+    "Pipfile.lock",
+    "tox.ini",
+    "pytest.ini",
+    "conftest.py",
+    "package.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    ".ci/**",
+    "scripts/ci/**",
+    "scripts/legacy_ratchet.py",
+    ".claude/**",
+    "tests/LEGACY_BASELINE*.json"
+  ],
+  "tests": [
+    "tests/**/test*.py"
+  ]
+}
