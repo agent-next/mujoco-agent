@@ -5,5 +5,9 @@ cd "$(dirname "$0")/.."
 PY="${PYTHON:-}"
 [ -z "$PY" ] && [ -x .venv/bin/python ] && PY=.venv/bin/python
 PY="${PY:-python3}"
+# ALL (default), empty (no affected tests) or the affected test files, one
+# quoted string from scripts/ci/affected.py; CI passes it as TESTS so a file
+# name is never evaluated as shell code.
+TESTS="${TESTS:-ALL}"
 "$PY" -m compileall -q src scripts
-"$PY" scripts/legacy_ratchet.py
+"$PY" scripts/legacy_ratchet.py "$TESTS"

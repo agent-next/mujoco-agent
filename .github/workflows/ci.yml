@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "23 3 * * *"  # nightly full suite: the safety net under PR test selection
   workflow_dispatch:
 
 jobs:
@@ -11,7 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # A PR head checks out as a merge commit: depth 2 holds it and its base
+      # parent, which is all the affected.py diff needs.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -25,7 +31,18 @@ jobs:
           python -m build
           python -m pip install --no-deps dist/*.whl
           cd /tmp && python -c "import mujoco_mcp; print(mujoco_mcp.__file__)"
+      # PRs run only the tests their change can reach; pushes to main and the
+      # nightly schedule run everything. A selector failure runs ALL: it must
+      # never turn into "no tests".
+      - id: affected
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = pull_request ] && T=$(python3 scripts/ci/affected.py --base HEAD^1 --format args); then
+            echo "tests=$T" >> "$GITHUB_OUTPUT"
+          else
+            echo "tests=ALL" >> "$GITHUB_OUTPUT"
+          fi
       - name: Verify contract
         env:
           MUJOCO_GL: disabled
+          TESTS: ${{ steps.affected.outputs.tests }}
         run: bash .claude/verify.sh
